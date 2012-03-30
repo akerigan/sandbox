@@ -1,0 +1,16 @@
+description = 'Sandbox project'
+
+allprojects {
+    apply plugin: 'java'
+
+    group = 'sanbox'
+    version = '1.0-SNAPSHOT'
+
+    targetCompatibility = "1.5"
+    sourceCompatibility = "1.5"
+
+    repositories {
+        mavenCentral();
+    }
+
+}

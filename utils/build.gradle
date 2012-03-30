@@ -1,0 +1,26 @@
+description = 'Utils module'
+
+def classpathPrefix='lib'
+
+jar {
+    manifest {
+        def manifestClasspath = configurations.runtime.collect {
+            classpathPrefix != null ? classpathPrefix + "/" + it.getName() : it.getName()
+        }.join(' ')
+        attributes 'Created-By': 'Gradle',
+                'Built-By': System.properties['user.name'],
+                'Build-Jdk': System.properties['java.version'],
+//                'Main-Class': 'org.MainClass',
+                'Class-Path': manifestClasspath
+    }
+}
+
+task dist(type: Zip, dependsOn: jar) {
+    into(archiveName) {
+        from(jar.archivePath)
+        into('lib') {
+            from configurations.runtime
+        }
+    }
+}
+
