@@ -11,13 +11,12 @@ public class SqlQueryMain {
                         "mnemo_action_p p"
                 ).where("p.routeid=? and type=?");
         System.out.println("selectQuery1 = " + selectQuery1);
-        SqlQuery selectQuery2 = selectQuery1.copy();
-        selectQuery2.where("and id in (1, 2, 3)");
+        SqlQuery selectQuery2 = selectQuery1.where("and id in (1, 2, 3)");
         System.out.println("selectQuery2 = " + selectQuery2);
         System.out.println("selectQuery1 = " + selectQuery1);
         SqlQuery updateQuery1 = SqlQuery.update("mnemo_action_p").set("status=?").set("type=?").where("p.routeid=?");
         System.out.println("updateQuery1 = " + updateQuery1);
-        SqlQuery updateQuery2 = updateQuery1.copy().where("and objectid=?");
+        SqlQuery updateQuery2 = updateQuery1.where("and objectid=?");
         System.out.println("updateQuery2 = " + updateQuery2);
         System.out.println("updateQuery1 = " + updateQuery1);
     }

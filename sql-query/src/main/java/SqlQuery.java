@@ -1,3 +1,5 @@
+import sandbox.StringUtils;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,16 +14,16 @@ public class SqlQuery {
 
     private int type;
     // select related
-    private CharSequence selectPart;
-    private CharSequence fromPart;
-    private StringBuilder orderPart;
+    private String selectPart;
+    private String fromPart;
+    private String orderPart;
     // update related
     private String tableName;
     private List<String> setExpressions;
     // unified
-    private StringBuilder wherePart;
+    private String wherePart;
 
-    public static SqlQuery select(CharSequence selectPart, CharSequence fromPart) {
+    public static SqlQuery select(String selectPart, String fromPart) {
         SqlQuery result = new SqlQuery();
         result.type = TYPE_SELECT;
         result.selectPart = selectPart;
@@ -37,39 +39,44 @@ public class SqlQuery {
     }
 
     public SqlQuery set(String expression) {
-        if (type == TYPE_UPDATE && expression != null) {
-            if (setExpressions == null) {
-                setExpressions = new ArrayList<String>();
+        if (type == TYPE_UPDATE && !StringUtils.isEmpty(expression)) {
+            SqlQuery result = copy();
+            if (result.setExpressions == null) {
+                result.setExpressions = new ArrayList<String>();
             }
-            setExpressions.add(expression);
+            result.setExpressions.add(expression.trim());
+            return result;
+        } else {
+            return this;
         }
-        return this;
     }
 
-    public SqlQuery where(CharSequence wherePart) {
-        if (wherePart != null) {
-            if (this.wherePart == null) {
-                this.wherePart = new StringBuilder();
+    public SqlQuery where(String wherePart) {
+        if (!StringUtils.isEmpty(wherePart)) {
+            SqlQuery result = copy();
+            if (StringUtils.isEmpty(result.wherePart)) {
+                result.wherePart = wherePart.trim();
+            } else {
+                result.wherePart = result.wherePart + " " + wherePart.trim();
             }
-            if (this.wherePart.length() > 0) {
-                this.wherePart.append(" ");
-            }
-            this.wherePart.append(wherePart);
+            return result;
+        } else {
+            return this;
         }
-        return this;
     }
 
-    public SqlQuery order(CharSequence orderPart) {
-        if (type == TYPE_SELECT && orderPart != null) {
-            if (this.orderPart == null) {
-                this.orderPart = new StringBuilder();
+    public SqlQuery order(String orderPart) {
+        if (type == TYPE_SELECT && !StringUtils.isEmpty(orderPart)) {
+            SqlQuery result = copy();
+            if (StringUtils.isEmpty(result.orderPart)) {
+                result.orderPart = orderPart.trim();
+            } else {
+                result.orderPart = result.orderPart + " " + orderPart.trim();
             }
-            if (this.orderPart.length() > 0) {
-                this.orderPart.append(" ");
-            }
-            this.orderPart.append(orderPart);
+            return result;
+        } else {
+            return this;
         }
-        return this;
     }
 
     @Override
@@ -82,11 +89,11 @@ public class SqlQuery {
             result.append(fromPart);
             if (wherePart != null) {
                 result.append(" where ");
-                result.append(wherePart.toString());
+                result.append(wherePart);
             }
             if (orderPart != null) {
                 result.append(" order by ");
-                result.append(orderPart.toString());
+                result.append(orderPart);
             }
         } else if (type == TYPE_UPDATE) {
             result.append("update ");
@@ -103,32 +110,26 @@ public class SqlQuery {
             }
             if (wherePart != null) {
                 result.append(" where ");
-                result.append(wherePart.toString());
+                result.append(wherePart);
             }
         }
         return result.toString();
     }
 
-    public SqlQuery copy() {
+    private SqlQuery copy() {
         SqlQuery result = new SqlQuery();
         result.type = type;
         if (type == TYPE_SELECT) {
             result.selectPart = selectPart;
             result.fromPart = fromPart;
-            if (wherePart != null) {
-                result.wherePart = new StringBuilder(wherePart);
-            }
-            if (orderPart != null) {
-                result.orderPart = new StringBuilder(orderPart);
-            }
+            result.wherePart = wherePart;
+            result.orderPart = orderPart;
         } else if (type == TYPE_UPDATE) {
             result.tableName = tableName;
             if (setExpressions != null) {
                 result.setExpressions = new ArrayList<String>(setExpressions);
             }
-            if (wherePart != null) {
-                result.wherePart = new StringBuilder(wherePart);
-            }
+            result.wherePart = wherePart;
         }
         return result;
     }
