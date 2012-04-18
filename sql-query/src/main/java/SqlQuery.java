@@ -16,6 +16,7 @@ public class SqlQuery {
     // select related
     private String selectPart;
     private String fromPart;
+    private String groupByPart;
     private String orderPart;
     // update related
     private String tableName;
@@ -79,6 +80,20 @@ public class SqlQuery {
         }
     }
 
+    public SqlQuery groupBy(String groupByPart) {
+        if (type == TYPE_SELECT && !StringUtils.isEmpty(groupByPart)) {
+            SqlQuery result = copy();
+            if (StringUtils.isEmpty(result.groupByPart)) {
+                result.groupByPart = groupByPart.trim();
+            } else {
+                result.groupByPart = result.groupByPart + "," + groupByPart.trim();
+            }
+            return result;
+        } else {
+            return this;
+        }
+    }
+
     @Override
     public String toString() {
         StringBuilder result = new StringBuilder();
@@ -90,6 +105,10 @@ public class SqlQuery {
             if (wherePart != null) {
                 result.append(" where ");
                 result.append(wherePart);
+            }
+            if (groupByPart != null) {
+                result.append(" group by ");
+                result.append(groupByPart);
             }
             if (orderPart != null) {
                 result.append(" order by ");
@@ -124,6 +143,7 @@ public class SqlQuery {
             result.fromPart = fromPart;
             result.wherePart = wherePart;
             result.orderPart = orderPart;
+            result.groupByPart = groupByPart;
         } else if (type == TYPE_UPDATE) {
             result.tableName = tableName;
             if (setExpressions != null) {
